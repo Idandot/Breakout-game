@@ -1,8 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.SocialPlatforms.Impl;
 using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 public class MainManager : MonoBehaviour
 {
@@ -11,21 +12,25 @@ public class MainManager : MonoBehaviour
     public Rigidbody Ball;
 
     public Text ScoreText;
+    public Text BestScoreText;
     public GameObject GameOverText;
-    
+
     private bool m_Started = false;
     private int m_Points;
-    
+
     private bool m_GameOver = false;
 
     
+
     // Start is called before the first frame update
     void Start()
     {
+        DefineBestPlayer();
+
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
-        
-        int[] pointCountArray = new [] {1,1,2,2,5,5};
+
+        int[] pointCountArray = new[] { 1, 1, 2, 2, 5, 5 };
         for (int i = 0; i < LineCount; ++i)
         {
             for (int x = 0; x < perLine; ++x)
@@ -60,6 +65,7 @@ public class MainManager : MonoBehaviour
                 SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
             }
         }
+        
     }
 
     void AddPoint(int point)
@@ -70,7 +76,16 @@ public class MainManager : MonoBehaviour
 
     public void GameOver()
     {
+        BetweenScenesData.instance.AddNewScore(m_Points);
+        DefineBestPlayer();
         m_GameOver = true;
         GameOverText.SetActive(true);
+    }
+
+    void DefineBestPlayer()
+    {
+        string bestPlayer = BetweenScenesData.instance.data.names[0];
+        int bestScore = BetweenScenesData.instance.data.scores[0];
+        BestScoreText.text = "Best score by " + bestPlayer + ": " + bestScore;
     }
 }
